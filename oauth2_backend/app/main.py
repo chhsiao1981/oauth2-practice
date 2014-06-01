@@ -15,6 +15,7 @@ import argparse
 
 from app import cfg
 from app.gevent_server import GeventServer
+from requests_oauthlib import OAuth2Session
 
 app = Bottle()
 
@@ -38,6 +39,56 @@ def put_id(the_id):
 def d_id(the_id):
     return ''
 
+
+@app.get('/register')
+def register():
+    global google
+
+    params = _process_params()
+    cfg.logger.debug('params: %s', params)
+
+    google.fetch_token(token_url, client_secret=client_secret, 
+                       authorization_response=redirect_url)
+
+    cfg.logger.debug('after fetch_token')
+
+    r = google.get('https://www.googleapis.com/oauth2/v1/userinfo')
+
+    cfg.logger.debug('user_info: r: %s', r)
+
+    return {"success": True}
+
+
+@app.get('/login')
+def login():
+    global google
+    params = _process_params()
+    the_path = params.get('url', '')
+    redirect_url = 'https://' + cfg.config.get('sitename', 'localhost') + the_path
+
+    cfg.logger.debug('params: %s the_path: %s', params, the_path)
+
+    client_secret = cfg.config.get('oauth2_client_secret', '')
+
+    authorization_base_url = "https://accounts.google.com/o/oauth2/auth"
+    token_url = "https://accounts.google.com/o/oauth2/token"
+
+    cfg.logger.debug('to OAuth2Session: redirect_uri: %s', redirect_uri)
+
+    authorization_url, state = google.authorization_url(authorization_base_url,
+                                                        # offline for refresh token
+                                                        # force to always make user click authorize
+                                                        access_type="offline", approval_prompt="force")
+
+    cfg.logger.debug('after authorization_url: authorization_url: %s state: %s', authorization_url, state)
+
+    return ''
+
+
+def _process_params():
+    return dict(request.params)
+
+
 def parse_args():
     ''' '''
     parser = argparse.ArgumentParser(description='oauth2_backend')
@@ -53,5 +104,12 @@ if __name__ == '__main__':
     (error_code, args) = parse_args()
 
     cfg.init({"port": args.port, "ini_filename": args.ini})
+
+    client_id = cfg.config.get('oauth2_client_id', '')
+    redirect_uri = 'https://' + cfg.config.get('sitename', 'localhost') + '/register'
+    scope = [
+        "https://www.googleapis.com/auth/userinfo.profile",
+    ]
+    google = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
 
     run(app, host='0.0.0.0', port=cfg.config.get('port'), server=GeventServer)

@@ -7,6 +7,8 @@ import random
 import math
 import base64
 import time
+import pymongo
+from pymongo import MongoClient
 import ujson as json
 
 _LOGGER_NAME = "app"
@@ -15,6 +17,9 @@ config = {}
 
 _mongo_map = {
     'user_info': 'user_info',
+}
+
+_ensure_index = {
 }
 
 def init(params):

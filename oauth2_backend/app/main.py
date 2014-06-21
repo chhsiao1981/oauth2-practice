@@ -128,8 +128,8 @@ def _process_session():
     session = request.environ['beaker.session']
     session_key = ''
     session_key2 = ''
+    the_timestamp = util.get_timestamp()
     if not session.has_key('value'):
-        the_timestamp = util.get_timestamp()
         session_key = util.gen_random_string() + '_' + str(the_timestamp)
         session_key2 = util.gen_random_string() + '_' + str(the_timestamp + 300)
         session['value'] = session_key

@@ -86,7 +86,7 @@ def login():
 
     cfg.logger.debug('after authorization_url: authorization_url: %s state: %s', authorization_url, state)
 
-    return ''
+    redirect(authorization_url)
 
 
 def _process_params():

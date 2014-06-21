@@ -119,7 +119,7 @@ def login():
     authorization_url, state = google.authorization_url(authorization_base_url,
                                                         # offline for refresh token
                                                         # force to always make user click authorize
-                                                        access_type="online", approval_prompt="auto")
+                                                        access_type="offline", approval_prompt="auto")
 
     cfg.logger.debug('after authorization_url: authorization_url: %s state: %s', authorization_url, state)
 

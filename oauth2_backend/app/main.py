@@ -66,7 +66,7 @@ def register():
 
     r = google.get('https://www.googleapis.com/oauth2/v1/userinfo')
 
-    the_struct = util.json_loads(r)
+    the_struct = util.json_loads(r.content)
 
     cfg.logger.debug('user_info: r: (%s, %s) the_struct: (%s, %s)', r.content, r.content.__class__.__name__, the_struct, the_struct.__class__.__name__)
 

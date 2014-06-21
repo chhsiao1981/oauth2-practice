@@ -78,16 +78,16 @@ def register():
 
     cfg.logger.debug('redirect_url: %s', redirect_url)
 
-    r = google.fetch_token(token_url, client_secret=client_secret, 
+    token = google.fetch_token(token_url, client_secret=client_secret, 
                            authorization_response=redirect_url)
 
-    cfg.logger.debug('after fetch_token: r: (%s, %s)', r, r.__class__.__name__)
+    cfg.logger.debug('after fetch_token: token: (%s, %s)', token, token.__class__.__name__)
 
     r = google.get('https://www.googleapis.com/oauth2/v1/userinfo')
 
     the_struct = util.json_loads(r.content)
 
-    util.db_update('user_info', {"user_id": 'google_' + str(the_struct['id'])}, {"google_id": the_struct['id'], 'name': the_struct['name'], 'given_name': the_struct['given_name'], 'family_name': the_struct['family_name'], 'session_key': session_key, 'session_key2': session_key2, 'token': r})
+    util.db_update('user_info', {"user_id": 'google_' + str(the_struct['id'])}, {"google_id": the_struct['id'], 'name': the_struct['name'], 'given_name': the_struct['given_name'], 'family_name': the_struct['family_name'], 'session_key': session_key, 'session_key2': session_key2, 'token': token})
 
     cfg.logger.debug('user_info: r.content: (%s, %s) the_struct: (%s, %s)', r.content, r.content.__class__.__name__, the_struct, the_struct.__class__.__name__)
 

@@ -29,7 +29,7 @@ def db_find(cf_name, key = None, fields={'_id': False}):
     return list(result)
 
 
-def util.get_timestamp():
+def get_timestamp():
     return int(time.time())
 
 

@@ -15,6 +15,7 @@ import argparse
 import urllib
 
 from app import cfg
+from app import util
 from app.gevent_server import GeventServer
 from requests_oauthlib import OAuth2Session
 

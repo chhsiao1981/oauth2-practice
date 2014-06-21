@@ -65,7 +65,7 @@ def register():
 
     r = google.get('https://www.googleapis.com/oauth2/v1/userinfo')
 
-    cfg.logger.debug('user_info: r: %s', r)
+    cfg.logger.debug('user_info: r: %s', r.content)
 
     return {"success": True}
 

@@ -45,7 +45,7 @@ def d_id(the_id):
 @app.get('/register')
 def register():
     headers = request.headers
-    cookies = request.get_cookie()
+    cookies = request.cookies
     params = _process_params()
     cfg.logger.debug('params: %s headers: %s cookies: %s', params, headers, cookies)
 

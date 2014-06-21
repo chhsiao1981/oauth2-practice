@@ -13,13 +13,23 @@ import ujson as json
 import sys
 import argparse
 import urllib
+from requests_oauthlib import OAuth2Session
+from beaker.middleware import SessionMiddleware
 
 from app import cfg
 from app import util
 from app.gevent_server import GeventServer
-from requests_oauthlib import OAuth2Session
+
+session_opts = {
+    'session.type': 'file',
+    'session.cookie_expires': 300,
+    'session.data_dir': '/data/session',
+    'session.auto': True
+}
 
 app = Bottle()
+
+app = SessionMiddleware(app, session_opts)
 
 @app.route('/')
 def r_index():

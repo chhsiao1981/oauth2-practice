@@ -49,6 +49,8 @@ def register():
 
     token_url = "https://accounts.google.com/o/oauth2/token"
 
+    client_secret = cfg.config.get('oauth2_client_secret', '')
+
     google.fetch_token(token_url, client_secret=client_secret, 
                        authorization_response=redirect_url)
 

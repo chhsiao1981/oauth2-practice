@@ -22,7 +22,7 @@ from app.gevent_server import GeventServer
 
 session_opts = {
     'session.type': 'file',
-    'session.cookie_expires': 300,
+    'session.cookie_expires': 1200,
     'session.data_dir': '/data/session',
     'session.auto': True
 }
@@ -52,14 +52,8 @@ def d_id(the_id):
 
 @app.get('/register')
 def register():
-    session = request.environ['beaker.session']
-    session_key = ''
-    if not session.has_key('value'):
-        session_key = util.gen_random_string()
-        session['value'] = session_key
-        session.save()   
-    else:
-        session_key = session['value']
+    (session_key, session_key2) = _process_session()
+    cfg.logger.debug('session_key: %s session_key2: %s', session_key, session_key2)
 
     headers = dict(request.headers)
     cookies = dict(request.cookies)
@@ -100,12 +94,8 @@ def register():
 
 @app.get('/login')
 def login():
-    session = request.environ['beaker.session']
-    if not session.has_key('value'):
-        session['value'] = util.gen_random_string() 
-        session.save()
-
-    cfg.logger.debug('session_value: %s', session['value'])
+    (session_key, session_key2) = _process_session()
+    cfg.logger.debug('session_key: %s session_key2', session_key, session_key2)
 
     params = _process_params()
     the_path = params.get('url', '')
@@ -127,11 +117,37 @@ def login():
     authorization_url, state = google.authorization_url(authorization_base_url,
                                                         # offline for refresh token
                                                         # force to always make user click authorize
-                                                        access_type="offline", approval_prompt="force")
+                                                        access_type="online", approval_prompt="auto")
 
     cfg.logger.debug('after authorization_url: authorization_url: %s state: %s', authorization_url, state)
 
     redirect(authorization_url)
+
+
+def _process_session():
+    session = request.environ['beaker.session']
+    session_key = ''
+    session_key2 = ''
+    if not session.has_key('value'):
+        the_timestamp = util.get_timestamp()
+        session_key = util.gen_random_string() + '_' + str(the_timestamp)
+        session_key2 = util.gen_random_string() + '_' + str(the_timestamp + 300)
+        session['value'] = session_key
+        session['value2'] = session_key2
+        session.save()
+    else:
+        session_key = session['value']
+        session_key2 = session['value2']
+        (session_id, session_timestamp) = session_key.split('_')
+        (session_id2, session_timestamp2) = session_key.split('_')
+        if the_timestamp - session_timestamp >= 300:
+            new_timestamp = max(the_timestamp, session_timestamp2 + 300)
+            session_key3 = util.gen_random_string() + '_' + str(the_timestamp)
+            session['value'] = session_key2
+            session['value2'] = session_key3
+            session.save()
+
+    return (session_key, session_key2)
 
 
 def _process_params():

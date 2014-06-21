@@ -87,7 +87,7 @@ def register():
     r = google.fetch_token(token_url, client_secret=client_secret, 
                            authorization_response=redirect_url)
 
-    cfg.logger.debug('after fetch_token: r.content: (%s, %s)', r.content, r.content.__class__.__name__)
+    cfg.logger.debug('after fetch_token: r: (%s, %s)', r, r.__class__.__name__)
 
     r = google.get('https://www.googleapis.com/oauth2/v1/userinfo')
 

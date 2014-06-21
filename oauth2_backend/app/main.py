@@ -48,6 +48,7 @@ def register():
     cfg.logger.debug('params: %s', params)
 
     token_url = "https://accounts.google.com/o/oauth2/token"
+    redirect_url = 'https://' + cfg.config.get('sitename', 'localhost') + the_path
 
     client_secret = cfg.config.get('oauth2_client_secret', '')
 

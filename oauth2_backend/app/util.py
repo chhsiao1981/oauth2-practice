@@ -13,6 +13,17 @@ from app import cfg
 def gen_random_string():
     return str(uuid.uuid4())
 
+
+def _int(the_val, default=0):
+    try:
+        result = int(the_val):
+    except Exception as e:
+        cfg.logger.debug('unable to _int: the_val: %s e: %s', the_val, e)
+        result = 0
+
+    return result
+
+
 def db_find(cf_name, key = None, fields={'_id': False}):
     result = []
     try:

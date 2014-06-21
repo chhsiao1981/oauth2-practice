@@ -140,7 +140,7 @@ def _process_session():
         session_key2 = session['value2']
         (session_id, session_timestamp) = session_key.split('_')
         (session_id2, session_timestamp2) = session_key.split('_')
-        if the_timestamp - session_timestamp >= 300:
+        if the_timestamp - util._int(session_timestamp) >= 300:
             new_timestamp = max(the_timestamp, session_timestamp2 + 300)
             session_key3 = util.gen_random_string() + '_' + str(the_timestamp)
             session['value'] = session_key2

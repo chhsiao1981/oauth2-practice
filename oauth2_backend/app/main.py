@@ -44,10 +44,17 @@ def d_id(the_id):
 
 @app.get('/register')
 def register():
-    global google
 
     params = _process_params()
     cfg.logger.debug('params: %s', params)
+
+    client_id = cfg.config.get('oauth2_client_id', '')
+    redirect_uri = 'https://' + cfg.config.get('sitename', 'localhost') + '/register'
+    scope = [
+        "https://www.googleapis.com/auth/userinfo.profile",
+    ]
+
+    google = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
 
     token_url = "https://accounts.google.com/o/oauth2/token"
     the_path = params.get('url', '')
@@ -75,17 +82,22 @@ def register():
 
 @app.get('/login')
 def login():
-    global google
     params = _process_params()
     the_path = params.get('url', '')
-    redirect_url = 'https://' + cfg.config.get('sitename', 'localhost') + the_path
 
     cfg.logger.debug('params: %s the_path: %s', params, the_path)
 
     client_secret = cfg.config.get('oauth2_client_secret', '')
 
     authorization_base_url = "https://accounts.google.com/o/oauth2/auth"
-    token_url = "https://accounts.google.com/o/oauth2/token"
+
+    client_id = cfg.config.get('oauth2_client_id', '')
+    redirect_uri = 'https://' + cfg.config.get('sitename', 'localhost') + '/register'
+    scope = [
+        "https://www.googleapis.com/auth/userinfo.profile",
+    ]
+
+    google = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
 
     authorization_url, state = google.authorization_url(authorization_base_url,
                                                         # offline for refresh token
@@ -116,12 +128,5 @@ if __name__ == '__main__':
     (error_code, args) = parse_args()
 
     cfg.init({"port": args.port, "ini_filename": args.ini})
-
-    client_id = cfg.config.get('oauth2_client_id', '')
-    redirect_uri = 'https://' + cfg.config.get('sitename', 'localhost') + '/register'
-    scope = [
-        "https://www.googleapis.com/auth/userinfo.profile",
-    ]
-    google = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
 
     run(app, host='0.0.0.0', port=cfg.config.get('port'), server=GeventServer)

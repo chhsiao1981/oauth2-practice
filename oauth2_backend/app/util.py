@@ -29,6 +29,10 @@ def db_find(cf_name, key = None, fields={'_id': False}):
     return list(result)
 
 
+def util.get_timestamp():
+    return int(time.time())
+
+
 def db_find_it(cf_name, key = None, fields={'_id': False}):
     result = None
     try:

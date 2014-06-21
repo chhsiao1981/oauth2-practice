@@ -64,7 +64,7 @@ def register():
     headers = dict(request.headers)
     cookies = dict(request.cookies)
     params = _process_params()
-    cfg.logger.debug('params: %s headers: %s cookies: %s', params, headers, cookies)
+    cfg.logger.debug('params: %s headers: %s session_key: %s cookies: %s', params, headers, session_key, cookies)
 
     client_id = cfg.config.get('oauth2_client_id', '')
     redirect_uri = 'https://' + cfg.config.get('sitename', 'localhost') + '/register'
@@ -103,7 +103,9 @@ def login():
     session = request.environ['beaker.session']
     if not session.has_key('value'):
         session['value'] = util.gen_random_string() 
-        session.save()   
+        session.save()
+
+    cfg.logger.debug('session_value: %s', session['value'])
 
     params = _process_params()
     the_path = params.get('url', '')

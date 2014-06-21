@@ -44,9 +44,10 @@ def d_id(the_id):
 
 @app.get('/register')
 def register():
-
+    headers = request.headers
+    cookies = request.get_cookie()
     params = _process_params()
-    cfg.logger.debug('params: %s', params)
+    cfg.logger.debug('params: %s headers: %s cookies: %s', params, headers, cookies)
 
     client_id = cfg.config.get('oauth2_client_id', '')
     redirect_uri = 'https://' + cfg.config.get('sitename', 'localhost') + '/register'

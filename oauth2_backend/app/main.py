@@ -29,8 +29,6 @@ session_opts = {
 
 app = Bottle()
 
-app = SessionMiddleware(app, session_opts)
-
 @app.route('/')
 def r_index():
     return ''
@@ -139,5 +137,7 @@ if __name__ == '__main__':
     (error_code, args) = parse_args()
 
     cfg.init({"port": args.port, "ini_filename": args.ini})
+
+    app = SessionMiddleware(app, session_opts)
 
     run(app, host='0.0.0.0', port=cfg.config.get('port'), server=GeventServer)

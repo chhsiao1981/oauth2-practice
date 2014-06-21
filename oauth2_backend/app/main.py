@@ -12,6 +12,7 @@ import time
 import ujson as json
 import sys
 import argparse
+import urllib
 
 from app import cfg
 from app.gevent_server import GeventServer
@@ -49,9 +50,13 @@ def register():
 
     token_url = "https://accounts.google.com/o/oauth2/token"
     the_path = params.get('url', '')
-    redirect_url = 'https://' + cfg.config.get('sitename', 'localhost') + the_path
+    qs = urllib.urlencode(params)
+
+    redirect_url = 'https://' + cfg.config.get('sitename', 'localhost') + '/register?' + qs
 
     client_secret = cfg.config.get('oauth2_client_secret', '')
+
+    cfg.logger.debug('redirect_url: %s', redirect_url)
 
     google.fetch_token(token_url, client_secret=client_secret, 
                        authorization_response=redirect_url)

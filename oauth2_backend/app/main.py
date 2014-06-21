@@ -47,6 +47,8 @@ def register():
     params = _process_params()
     cfg.logger.debug('params: %s', params)
 
+    token_url = "https://accounts.google.com/o/oauth2/token"
+
     google.fetch_token(token_url, client_secret=client_secret, 
                        authorization_response=redirect_url)
 
@@ -72,8 +74,6 @@ def login():
 
     authorization_base_url = "https://accounts.google.com/o/oauth2/auth"
     token_url = "https://accounts.google.com/o/oauth2/token"
-
-    cfg.logger.debug('to OAuth2Session: redirect_uri: %s', redirect_uri)
 
     authorization_url, state = google.authorization_url(authorization_base_url,
                                                         # offline for refresh token

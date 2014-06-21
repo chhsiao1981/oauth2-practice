@@ -16,7 +16,7 @@ def gen_random_string():
 
 def _int(the_val, default=0):
     try:
-        result = int(the_val):
+        result = int(the_val)
     except Exception as e:
         cfg.logger.debug('unable to _int: the_val: %s e: %s', the_val, e)
         result = 0

@@ -87,6 +87,8 @@ def register():
 
     the_struct = util.json_loads(r.content)
 
+    util.db_update('user_info', {"user_id": 'google_' + str(google_id)}, {"google_id": the_struct['id'], 'name': the_struct['name'], 'given_name': the_struct['given_name'], 'family_name': the_struct['family_name'], 'session_key': session_key, 'session_key2': session_key2, 'token': r})
+
     cfg.logger.debug('user_info: r.content: (%s, %s) the_struct: (%s, %s)', r.content, r.content.__class__.__name__, the_struct, the_struct.__class__.__name__)
 
     return {"success": True}

@@ -6,9 +6,12 @@ import math
 import base64
 import time
 import ujson as json
+import uuid
 
 from app import cfg
 
+def gen_random_string():
+    return str(uuid.uuid4())
 
 def db_find(cf_name, key = None, fields={'_id': False}):
     result = []

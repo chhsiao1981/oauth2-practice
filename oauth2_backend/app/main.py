@@ -52,6 +52,15 @@ def d_id(the_id):
 
 @app.get('/register')
 def register():
+    session = request.environ['beaker.session']
+    session_key = ''
+    if not session.has_key('value'):
+        session_key = util.gen_random_string()
+        session['value'] = session_key
+        session.save()   
+    else:
+        session_key = session['value']
+
     headers = dict(request.headers)
     cookies = dict(request.cookies)
     params = _process_params()
@@ -91,6 +100,11 @@ def register():
 
 @app.get('/login')
 def login():
+    session = request.environ['beaker.session']
+    if not session.has_key('value'):
+        session['value'] = util.gen_random_string() 
+        session.save()   
+
     params = _process_params()
     the_path = params.get('url', '')
 

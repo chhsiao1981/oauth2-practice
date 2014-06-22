@@ -72,7 +72,7 @@ def register():
     the_path = params.get('url', '')
     qs = urllib.urlencode(params)
 
-    redirect_url = 'https://' + cfg.config.get('sitename', 'localhost') + '/register?' + qs
+    redirect_url = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/register?' + qs
 
     client_secret = cfg.config.get('oauth2_client_secret', '')
 
@@ -91,7 +91,9 @@ def register():
 
     cfg.logger.debug('user_info: r.content: (%s, %s) the_struct: (%s, %s)', r.content, r.content.__class__.__name__, the_struct, the_struct.__class__.__name__)
 
-    return {"success": True}
+    home_url = 'http://' + cfg.config.get('sitename', 'localhost')
+
+    redirect(home_url)
 
 
 @app.get('/login')

@@ -113,6 +113,16 @@ def register():
     redirect(home_url)
 
 
+@app.get('/logout')
+def logout():
+    (session_key, session_key2) = _process_session()
+    _remove_all(session_key)
+    _remove_all(session_key2)
+
+    the_url = 'http://' + cfg.config.get('sitename', 'localhost')
+    redirect(the_url)
+
+
 @app.get('/login')
 def login():
     (session_key, session_key2) = _process_session()
@@ -187,7 +197,12 @@ def _process_result(the_result):
     #cfg.logger.debug('the_obj: %s', the_obj)
     response.content_type = 'application/json'
     return util.json_dumps(the_result)
-    
+
+
+def _remove_all(session_key):
+    util.db_update('user_info', {'session_key': session_key}, {'session_key': ''}, multi=True)
+    util.db_update('user_info', {'session_key2': session_key}, {'session_key2': ''}, multi=True)
+    util.db_remove('session_user_map', {"session_key": session_key})
 
 
 def parse_args():

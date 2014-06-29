@@ -117,6 +117,31 @@ def db_insert(cf_name, val):
     return result
 
 
+def db_remove(cf_name, key):
+    error_code = S_OK
+    if cf_name in cfg._mongo_map:
+        cfg.logger.error('remove error! CHECK CODE! cf_name: %s', cf_name)
+        send_error_msg('db_remove error! CHECK_CODE! cf_name: %s' % (cf_name))
+        return
+
+    result = None
+    try:
+        result = cfg.config.get(cf_name).remove(key)
+    except Exception as e:
+        cfg.logger.error('unable to remove: cf_name: %s key: %s', cf_name, key)
+        send_error_msg('unable to db_remove: cf_name: %s key: %s e: %s' % (cf_name, key, e))
+        error_code = S_ERR
+        result = None
+
+    if error_code != S_OK:
+        cfg._init_mongo()
+
+    if result is None:
+        result = {}
+
+    return dict(result)
+
+
 def json_dumps(json_struct, default_val='', sort_keys=False):
     result = default_val
     try:

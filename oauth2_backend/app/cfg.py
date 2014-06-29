@@ -17,6 +17,7 @@ config = {}
 
 _mongo_map = {
     'user_info': 'user_info',
+    'session_user_map': 'session_user_map',
 }
 
 _ensure_index = {

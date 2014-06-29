@@ -103,8 +103,8 @@ def register():
     user_id = 'google_' + str(the_struct['id'])
     util.db_update('user_info', {"user_id": user_id}, {"google_id": the_struct['id'], 'name': the_struct['name'], 'given_name': the_struct['given_name'], 'family_name': the_struct['family_name'], 'session_key': session_key, 'session_key2': session_key2, 'token': token})
 
-    util.db_update('session_user_map', {"session_key": session_key, "user_id": user_id})
-    util.db_update('session_user_map', {"session_key": session_key2, "user_id": user_id})
+    util.db_update('session_user_map', {"session_key": session_key}, {"user_id": user_id})
+    util.db_update('session_user_map', {"session_key": session_key2}, {"user_id": user_id})
 
     cfg.logger.debug('user_info: r.content: (%s, %s) the_struct: (%s, %s)', r.content, r.content.__class__.__name__, the_struct, the_struct.__class__.__name__)
 

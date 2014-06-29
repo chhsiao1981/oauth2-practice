@@ -38,6 +38,7 @@ def r_index():
 @app.get('/with_check')
 def p_with_check():
     (error_code, user_info) = util_user.is_valid_user(request)
+    cfg.logger.warning('after is_valid_user: error_code: %s user_info: %s', error_code, user_info)
     if error_code != S_OK:
         _redirect_login()
         return
@@ -174,6 +175,15 @@ def _process_session():
 
 def _process_params():
     return dict(request.params)
+
+
+def _process_result(the_result):
+    response.set_header('Access-Control-Allow-Origin', '*')
+    response.set_header('Access-Control-Allow-Methods', '*')
+    #cfg.logger.debug('the_obj: %s', the_obj)
+    response.content_type = 'application/json'
+    return util.json_dumps(the_result)
+    
 
 
 def parse_args():

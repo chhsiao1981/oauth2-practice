@@ -112,7 +112,7 @@ def register():
 @app.get('/login')
 def login():
     (session_key, session_key2) = _process_session()
-    cfg.logger.debug('session_key: %s session_key2', session_key, session_key2)
+    cfg.logger.debug('session_key: %s session_key2: %s', session_key, session_key2)
 
     params = _process_params()
     the_path = params.get('url', '')

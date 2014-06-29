@@ -33,17 +33,28 @@ app = Bottle()
 def r_index():
     return ''
 
-@app.post('/<the_id>')
-def p_id(the_id):
-    return ''
 
-@app.get('/<the_id>')
-def g_id(the_id):
-    return ''
+@app.post('/with_check')
+def p_with_check():
+    (error_code, user_info) = util_user.is_valid_user(request)
+    if error_code != S_OK:
+        _redirect_login()
+        return
+
+    return _process_result({"success": True, "user_info": user_info})
+
+
+@app.get('/without_check')
+def g_without_check():
+    (error_code, user_info) = util_user.is_valid_user_without_check()
+
+    return _process_result({"success": True, "error_code": error_code, "user_info": user_info})
+
 
 @app.put('/<the_id>')
 def put_id(the_id):
     return ''
+
 
 @app.delete('/<the_id>')
 def d_id(the_id):
@@ -126,6 +137,12 @@ def login():
     cfg.logger.debug('after authorization_url: authorization_url: %s state: %s', authorization_url, state)
 
     redirect(authorization_url)
+
+
+def _redirect_login():
+    qs = ''
+    redirect_url = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/login?' + qs
+    redirect(redirect_url)
 
 
 def _process_session():

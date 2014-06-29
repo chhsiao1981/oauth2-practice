@@ -123,7 +123,7 @@ def login():
     authorization_base_url = "https://accounts.google.com/o/oauth2/auth"
 
     client_id = cfg.config.get('oauth2_client_id', '')
-    redirect_uri = 'https://' + cfg.config.get('sitename', 'localhost') + '/register'
+    redirect_uri = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/register'
     scope = [
         "https://www.googleapis.com/auth/userinfo.profile",
     ]

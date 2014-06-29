@@ -73,7 +73,7 @@ def register():
     cfg.logger.debug('params: %s headers: %s session_key: %s cookies: %s', params, headers, session_key, cookies)
 
     client_id = cfg.config.get('oauth2_client_id', '')
-    redirect_uri = 'https://' + cfg.config.get('sitename', 'localhost') + '/register'
+    redirect_uri = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/register'
     scope = [
         "https://www.googleapis.com/auth/userinfo.profile",
     ]

@@ -34,7 +34,7 @@ def r_index():
     return ''
 
 
-@app.post('/with_check')
+@app.get('/with_check')
 def p_with_check():
     (error_code, user_info) = util_user.is_valid_user(request)
     if error_code != S_OK:

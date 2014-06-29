@@ -40,6 +40,26 @@ def db_find(cf_name, key = None, fields={'_id': False}):
     return list(result)
 
 
+def db_find2(cf_name, key = None, fields={'_id': False}):
+    error_code = S_OK
+    result = []
+    try:
+        if key is None:
+            result = cfg.config.get(cf_name).find(fields=fields)
+        else:
+            result = cfg.config.get(cf_name).find(key, fields=fields)
+        error_code = S_OK
+    except:
+        cfg.logger.exception('unable to db_find: cf_name: %s key: %s', cf_name, key)
+        result = None
+        error_code = S_ERR
+
+    if result is None:
+        result = []
+
+    return (error_code, list(result))
+
+
 def get_timestamp():
     return int(time.time())
 

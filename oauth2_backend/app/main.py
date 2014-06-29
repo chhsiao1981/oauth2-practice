@@ -18,6 +18,7 @@ from beaker.middleware import SessionMiddleware
 
 from app import cfg
 from app import util
+from app import util_user
 from app.gevent_server import GeventServer
 
 session_opts = {

@@ -102,4 +102,4 @@ def _deserialize_session_key(session_key):
 
 
 def _serialize_session_key(user_id, session_timestamp, session_id):
-    return '@'.join([user_id, str(session_timestamp), session_id)
+    return '@'.join([user_id, str(session_timestamp), session_id])

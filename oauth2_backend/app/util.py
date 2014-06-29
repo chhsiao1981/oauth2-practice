@@ -91,7 +91,7 @@ def db_find_one(cf_name, key, fields={'_id': False}):
     return dict(result)
 
 
-def db_update(cf_name, key, val, upsert=True):
+def db_update(cf_name, key, val, upsert=True, multi=True):
     if not key or not val:
         #cfg.logger.exception('not key or val: key: %s val: %s', key, val)
         return
@@ -99,7 +99,7 @@ def db_update(cf_name, key, val, upsert=True):
     #cfg.logger.debug('cf_name: %s key: %s val: %s', cf_name, key, val)
     result = {}
     try:
-        result = cfg.config.get(cf_name).update(key, {'$set':val}, upsert=upsert, w=1)
+        result = cfg.config.get(cf_name).update(key, {'$set':val}, upsert=upsert, multi=multi, w=1)
     except Exception as e:
         cfg.logger.warning('unable to db_update: cf_name: %s key: %s val: %s e: %s', cf_name, key, val, e)
     return result

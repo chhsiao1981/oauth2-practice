@@ -120,7 +120,7 @@ def db_insert(cf_name, val):
 def json_dumps(json_struct, default_val='', sort_keys=False):
     result = default_val
     try:
-        result = json.dumps(json_struct, sort_keys=sort_keys)
+        result = json.dumps(json_struct)
     except:
         cfg.logger.exception('unable to json_dumps: json_struct: %s', json_struct)
 

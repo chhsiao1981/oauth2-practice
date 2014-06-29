@@ -40,7 +40,7 @@ def _session_user_mapping(session):
     if not db_results:
         return (S_ERR, {})
 
-    user_id = db_results[0]
+    user_id = db_results[0].get('user_id', '')
 
     user_info = util.db_find_one('user_info', {"user_id": user_id})
 

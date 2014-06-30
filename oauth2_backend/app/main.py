@@ -171,8 +171,10 @@ def login():
 
 def _redirect_login():
     the_url = request.path + '?' + request.query_string
-    cfg.logger.warning('the_url: %s', the_url)
-    redirect_url = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/login?url=' + urllib.urlencode(the_url)
+    qs_dict = {"url": the_url}
+    qs = urllib.urlencode(qs_dict)
+    cfg.logger.warning('the_url: %s qs: %s', the_url, qs)
+    redirect_url = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/login?' + qs
     redirect(redirect_url)
 
 

@@ -65,7 +65,7 @@ def d_id(the_id):
 
 @app.get('/register')
 def register():
-    (session_struct, session_struct2) = _process_session()
+    (session_struct, session_struct2) = util_user.process_session(request)
     cfg.logger.debug('session_struct: %s session_struct2: %s', session_struct, session_struct2)
 
     headers = dict(request.headers)
@@ -128,7 +128,7 @@ def register():
 
 @app.get('/logout')
 def logout():
-    (session_struct, session_struct2) = util_user.process_session()
+    (session_struct, session_struct2) = util_user.process_session(request)
     util_user.remove_session(session_struct)
     util_user.remove_session(session_struct2)
 
@@ -138,7 +138,7 @@ def logout():
 
 @app.get('/login')
 def login():
-    (session_struct, session_struct) = util_user.process_session()
+    (session_struct, session_struct) = util_user.process_session(request)
     cfg.logger.debug('session_struct: %s session_struct2: %s', session_struct, session_struct2)
 
     params = _process_params()

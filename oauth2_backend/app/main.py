@@ -138,7 +138,7 @@ def logout():
 
 @app.get('/login')
 def login():
-    (session_struct, session_struct) = util_user.process_session(request)
+    (session_struct, session_struct2) = util_user.process_session(request)
     cfg.logger.debug('session_struct: %s session_struct2: %s', session_struct, session_struct2)
 
     params = _process_params()

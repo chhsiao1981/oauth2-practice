@@ -64,6 +64,10 @@ def get_timestamp():
     return int(time.time())
 
 
+def get_milli_timestamp():
+    return int(time.time() * 1000)
+
+
 def db_find_it(cf_name, key = None, fields={'_id': False}):
     result = None
     try:

@@ -71,9 +71,9 @@ def register():
     headers = dict(request.headers)
     cookies = dict(request.cookies)
     params = _process_params()
-    login_key = params.get('key', '')
+    state = params.get('state', '')
 
-    cfg.logger.debug('params: %s headers: %s session_key: %s cookies: %s login_key: %s', params, headers, session_key, cookies, login_key)
+    cfg.logger.debug('params: %s headers: %s session_key: %s cookies: %s state: %s', params, headers, session_key, cookies, state)
 
     client_id = cfg.config.get('oauth2_client_id', '')
     redirect_uri = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/register'
@@ -110,7 +110,7 @@ def register():
 
     cfg.logger.debug('user_info: r.content: (%s, %s) the_struct: (%s, %s)', r.content, r.content.__class__.__name__, the_struct, the_struct.__class__.__name__)
 
-    login_info = util.db_find_one('login_info', {"login_key": login_key})
+    login_info = util.db_find_one('login_info', {"state": state})
 
     qs = login_info.get('url', '')
 
@@ -141,18 +141,14 @@ def login():
 
     the_timestamp = util.get_timestamp()
 
-    login_key = str(the_timestamp) + '_' + util.gen_random_string()
-
     cfg.logger.debug('params: %s the_path: %s', params, the_path)
-
-    util.db_insert('login_info', {"login_key": login_key, "the_timestamp": the_timestamp, "params": params, "url": the_path})
 
     client_secret = cfg.config.get('oauth2_client_secret', '')
 
     authorization_base_url = "https://accounts.google.com/o/oauth2/auth"
 
     client_id = cfg.config.get('oauth2_client_id', '')
-    redirect_uri = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/register?key=' + login_key
+    redirect_uri = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/register'
     scope = [
         "https://www.googleapis.com/auth/userinfo.profile",
     ]
@@ -163,6 +159,8 @@ def login():
                                                         # offline for refresh token
                                                         # force to always make user click authorize
                                                         access_type="offline", approval_prompt="auto")
+
+    util.db_insert('login_info', {"state": state, "the_timestamp": the_timestamp, "params": params, "url": the_path})
 
     cfg.logger.debug('after authorization_url: authorization_url: %s state: %s', authorization_url, state)
 

@@ -81,7 +81,7 @@ def remove_session(session_struct):
 
 
 def _construct_session_struct(the_timestamp):
-    return {"key": util.gen_random_string() + "_" + str(the_timestamp), "the_timestamp"; the_timestamp}
+    return {"key": util.gen_random_string() + "_" + str(the_timestamp), "the_timestamp": the_timestamp}
 
 
 def _extract_session_struct_from_session_key(session_key):

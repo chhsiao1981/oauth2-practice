@@ -65,15 +65,15 @@ def d_id(the_id):
 
 @app.get('/register')
 def register():
-    (session_key, session_key2) = _process_session()
-    cfg.logger.debug('session_key: %s session_key2: %s', session_key, session_key2)
+    (session_struct, session_struct2) = _process_session()
+    cfg.logger.debug('session_struct: %s session_struct2: %s', session_struct, session_struct2)
 
     headers = dict(request.headers)
     cookies = dict(request.cookies)
     params = _process_params()
     state = params.get('state', '')
 
-    cfg.logger.debug('params: %s headers: %s session_key: %s cookies: %s state: %s', params, headers, session_key, cookies, state)
+    cfg.logger.debug('params: %s headers: %s session_struct: %s cookies: %s state: %s', params, headers, session_struct, cookies, state)
 
     client_id = cfg.config.get('oauth2_client_id', '')
     redirect_uri = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/register'
@@ -83,6 +83,7 @@ def register():
 
     google = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
 
+    # fetch token
     token_url = "https://accounts.google.com/o/oauth2/token"
     #the_path = params.get('url', '')
     qs = urllib.urlencode(params)
@@ -98,18 +99,22 @@ def register():
 
     cfg.logger.debug('after fetch_token: token: (%s, %s)', token, token.__class__.__name__)
 
+    # get user info
     r = google.get('https://www.googleapis.com/oauth2/v1/userinfo')
 
     the_struct = util.json_loads(r.content)
 
     user_id = 'google_' + str(the_struct['id'])
-    util.db_update('user_info', {"user_id": user_id}, {"google_id": the_struct['id'], 'name': the_struct['name'], 'given_name': the_struct['given_name'], 'family_name': the_struct['family_name'], 'session_key': session_key, 'session_key2': session_key2, 'token': token})
 
-    util.db_update('session_user_map', {"session_key": session_key}, {"user_id": user_id})
-    util.db_update('session_user_map', {"session_key": session_key2}, {"user_id": user_id})
+    # save
+    util_user.save_user(user_id, {"google_id": the_struct['id'], 'name': the_struct['name'], 'given_name': the_struct['given_name'], 'family_name': the_struct['family_name'], 'session_key': session_struct.get('key', ''), 'session_key2': session_struct2.get('key', ''), 'token': token})
+
+    util_user.save_session_user_map(session_struct, user_id)
+    util_user.save_session_user_map(session_struct2, user_id)
 
     cfg.logger.debug('user_info: r.content: (%s, %s) the_struct: (%s, %s)', r.content, r.content.__class__.__name__, the_struct, the_struct.__class__.__name__)
 
+    # return
     login_info = util.db_find_one('login_info', {"state": state})
 
     qs = login_info.get('url', '')
@@ -123,9 +128,9 @@ def register():
 
 @app.get('/logout')
 def logout():
-    (session_key, session_key2) = _process_session()
-    _remove_all(session_key)
-    _remove_all(session_key2)
+    (session_struct, session_struct2) = util_user.process_session()
+    util_user.remove_session(session_struct)
+    util_user.remove_session(session_struct2)
 
     the_url = 'http://' + cfg.config.get('sitename', 'localhost')
     redirect(the_url)
@@ -133,8 +138,8 @@ def logout():
 
 @app.get('/login')
 def login():
-    (session_key, session_key2) = _process_session()
-    cfg.logger.debug('session_key: %s session_key2: %s', session_key, session_key2)
+    (session_struct, session_struct) = util_user.process_session()
+    cfg.logger.debug('session_struct: %s session_struct2: %s', session_struct, session_struct2)
 
     params = _process_params()
     the_path = params.get('url', '')
@@ -176,32 +181,6 @@ def _redirect_login():
     redirect(redirect_url)
 
 
-def _process_session():
-    session = request.environ['beaker.session']
-    session_key = ''
-    session_key2 = ''
-    the_timestamp = util.get_timestamp()
-    if not session.has_key('value'):
-        session_key = util.gen_random_string() + '_' + str(the_timestamp)
-        session_key2 = util.gen_random_string() + '_' + str(the_timestamp + 300)
-        session['value'] = session_key
-        session['value2'] = session_key2
-        session.save()
-    else:
-        session_key = session['value']
-        session_key2 = session['value2']
-        (session_id, session_timestamp) = session_key.split('_')
-        (session_id2, session_timestamp2) = session_key.split('_')
-        if the_timestamp - util._int(session_timestamp) >= 300:
-            new_timestamp = max(the_timestamp, util._int(session_timestamp2) + 300)
-            session_key3 = util.gen_random_string() + '_' + str(new_timestamp)
-            session['value'] = session_key2
-            session['value2'] = session_key3
-            session.save()
-
-    return (session_key, session_key2)
-
-
 def _process_params():
     return dict(request.params)
 
@@ -212,12 +191,6 @@ def _process_result(the_result):
     #cfg.logger.debug('the_obj: %s', the_obj)
     response.content_type = 'application/json'
     return util.json_dumps(the_result)
-
-
-def _remove_all(session_key):
-    util.db_update('user_info', {'session_key': session_key}, {'session_key': ''}, multi=True)
-    util.db_update('user_info', {'session_key2': session_key}, {'session_key2': ''}, multi=True)
-    util.db_remove('session_user_map', {"session_key": session_key})
 
 
 def parse_args():

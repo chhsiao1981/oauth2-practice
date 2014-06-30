@@ -23,6 +23,73 @@ def is_valid_user(request):
     return (S_OK, user_info)
 
 
+def process_session(request):
+    session = request.environ['beaker.session']
+    session_struct = {}
+    session_struct2 = {}
+    the_timestamp = util.get_timestamp()
+
+    if not session.has_key('value'):
+        session_struct = _construct_session_struct(the_timestamp)
+        session['value'] = session_struct.get('key', '')
+
+        session_struct2 = _construct_session_struct(the_timestamp + 300)
+        session['value2'] = session_struct2.get('key', '')
+        session_key = util.gen_random_string() + '_' + str(the_timestamp)
+        session_key2 = util.gen_random_string() + '_' + str(the_timestamp + 300)
+        session['value'] = session_key
+        session['value2'] = session_key2
+        session.save()
+    else:
+        session_key = session['value']
+        session_key2 = session['value2']
+
+        session_struct = _extract_session_struct_from_session_key(session_key)
+        session_struct2 = _extract_session_struct_from_session_key(session_key2)
+
+        session_timestamp = session_struct.get('the_timestamp', 0)
+        session_timestamp2 = session_struct2.get('the_timestamp', 0)
+        if the_timestamp - util._int(session_timestamp) >= 300:
+            new_timestamp = max(the_timestamp, util._int(session_timestamp2) + 300)
+            session_struct3 = _construct_session_struct(new_timestamp)
+
+            session_struct = session_struct2
+            session_struct2 = session_struct3
+            session['value'] = session_struct.get('key', '')
+            session['value2'] = session_struct2.get('key', '')
+            session.save()
+
+    return (session_struct, session_struct2)
+
+
+def save_user(user_id, user_info):
+    util.db_update('user_info', {"user_id": user_id}, user_info)
+
+
+def save_session_user_map(session_struct, user_id):
+    util.db_update('session_user_map', {"session_key": session_struct.get('key', ''), 'the_timestamp': session_struct.get('the_timestamp', 0), 'user_id': user_id})
+
+
+def remove_session(session_struct):
+    session_key = session_struct.get('key', '')
+    if not session_key:
+        return
+
+    util.db_update('user_info', {'session_key': session_key}, {'session_key': ''}, multi=True)
+    util.db_update('user_info', {'session_key2': session_key}, {'session_key2': ''}, multi=True)
+    util.db_remove('session_user_map', {"session_key": session_key})
+
+
+def _construct_session_struct(the_timestamp):
+    return {"key": util.gen_random_string() + "_" + str(the_timestamp), "the_timestamp"; the_timestamp}
+
+
+def _extract_session_struct_from_session_key(session_key):
+    (session_id, session_timestamp) = session_key.split('_')
+
+    return {"key": session_key, "the_timestamp": util._int(session_timestamp)}
+
+
 def _session_user_mapping(session):
     session_key = session['value']
     session_list = [session_key]

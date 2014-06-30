@@ -85,9 +85,9 @@ def register():
 
     token_url = "https://accounts.google.com/o/oauth2/token"
     #the_path = params.get('url', '')
-    #qs = urllib.urlencode(params)
+    qs = urllib.urlencode(params)
 
-    redirect_url = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/register'
+    redirect_url = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/register?' + qs
 
     client_secret = cfg.config.get('oauth2_client_secret', '')
 

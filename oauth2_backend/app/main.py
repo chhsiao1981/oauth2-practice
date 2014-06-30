@@ -107,7 +107,7 @@ def register():
     user_id = 'google_' + str(the_struct['id'])
 
     # save
-    util_user.save_user(user_id, {"google_id": the_struct['id'], 'name': the_struct['name'], 'given_name': the_struct['given_name'], 'family_name': the_struct['family_name'], 'session_key': session_struct.get('key', ''), 'session_key2': session_struct2.get('key', ''), 'token': token})
+    util_user.save_user(user_id, session_struct.get('key', ''), session_struct2.get('key', ''), {"google_id": the_struct['id'], 'name': the_struct['name'], 'given_name': the_struct['given_name'], 'family_name': the_struct['family_name'], 'token': token})
 
     util_user.save_session_user_map(session_struct, user_id)
     util_user.save_session_user_map(session_struct2, user_id)

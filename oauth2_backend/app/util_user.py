@@ -62,12 +62,16 @@ def process_session(request):
     return (session_struct, session_struct2)
 
 
-def save_user(user_id, user_info):
-    util.db_update('user_info', {"user_id": user_id}, user_info)
+def save_user(user_id, session_key, session_key2, user_info):
+    util.db_update('user_info', {"user_id": user_id}, {"session_key", session_key, "session_key2": session_key2, "user_info": user_info})
 
 
 def save_session_user_map(session_struct, user_id):
-    util.db_update('session_user_map', {"session_key": session_struct.get('key', ''), 'the_timestamp': session_struct.get('the_timestamp', 0), 'user_id': user_id})
+    session_key = session_struct.get('key', '')
+    if not session_key:
+        return
+
+    util.db_update('session_user_map', {"session_key": session_key}, {'the_timestamp': session_struct.get('the_timestamp', 0), 'user_id': user_id})
 
 
 def remove_session(session_struct):

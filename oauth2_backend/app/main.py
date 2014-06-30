@@ -32,7 +32,7 @@ app = Bottle()
 
 @app.route('/')
 def r_index():
-    return ''
+    return _process_result({"success": True, "msg": "this is home"})
 
 
 @app.get('/with_check')

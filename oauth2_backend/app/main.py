@@ -71,7 +71,9 @@ def register():
     headers = dict(request.headers)
     cookies = dict(request.cookies)
     params = _process_params()
-    cfg.logger.debug('params: %s headers: %s session_key: %s cookies: %s', params, headers, session_key, cookies)
+    login_key = params.get('key', '')
+
+    cfg.logger.debug('params: %s headers: %s session_key: %s cookies: %s login_key: %s', params, headers, session_key, cookies, login_key)
 
     client_id = cfg.config.get('oauth2_client_id', '')
     redirect_uri = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/register'
@@ -82,10 +84,10 @@ def register():
     google = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
 
     token_url = "https://accounts.google.com/o/oauth2/token"
-    the_path = params.get('url', '')
-    qs = urllib.urlencode(params)
+    #the_path = params.get('url', '')
+    #qs = urllib.urlencode(params)
 
-    redirect_url = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/register?' + qs
+    redirect_url = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/register'
 
     client_secret = cfg.config.get('oauth2_client_secret', '')
 
@@ -108,9 +110,15 @@ def register():
 
     cfg.logger.debug('user_info: r.content: (%s, %s) the_struct: (%s, %s)', r.content, r.content.__class__.__name__, the_struct, the_struct.__class__.__name__)
 
-    home_url = 'http://' + cfg.config.get('sitename', 'localhost')
+    login_info = util.db_find_one('login_info', {"login_key": login_key})
 
-    redirect(home_url)
+    qs = login_info.get('url', '')
+
+    redirect_url = 'http://' + cfg.config.get('sitename', 'localhost') + qs
+
+    cfg.logger.warning('to redirect: redirect_url: %s', redirect_url)
+
+    redirect(redirect_url)
 
 
 @app.get('/logout')
@@ -131,14 +139,20 @@ def login():
     params = _process_params()
     the_path = params.get('url', '')
 
+    the_timestamp = util.get_timestamp()
+
+    login_key = str(the_timestamp) + '_' + util.gen_random_string()
+
     cfg.logger.debug('params: %s the_path: %s', params, the_path)
+
+    util.db_insert('login_info', {"login_key": login_key, "the_timestamp": the_timestamp, "params": params, "url": the_path})
 
     client_secret = cfg.config.get('oauth2_client_secret', '')
 
     authorization_base_url = "https://accounts.google.com/o/oauth2/auth"
 
     client_id = cfg.config.get('oauth2_client_id', '')
-    redirect_uri = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/register'
+    redirect_uri = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/register?key=' + login_key
     scope = [
         "https://www.googleapis.com/auth/userinfo.profile",
     ]
@@ -156,8 +170,8 @@ def login():
 
 
 def _redirect_login():
-    qs = ''
-    redirect_url = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/login?' + qs
+    the_url = request.path + '?' + request.query_string
+    redirect_url = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/login?url=' + urllib.urlencode(the_url)
     redirect(redirect_url)
 
 

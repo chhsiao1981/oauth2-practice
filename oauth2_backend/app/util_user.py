@@ -83,9 +83,10 @@ def _check_refresh_session(session, session_key, session_key2, user_info):
 
 
 def _create_session_key(user_id):
-    session_key = _serialize_session_key(user_id, util.get_timestamp(), util.gen_random_string())
+    the_timestamp = util.get_milli_timestamp()
+    session_key = _serialize_session_key(user_id, the_timestamp, util.gen_random_string())
 
-    util.db_update('session_user_map', {"session_key": session_key}, {"user_id": user_id})
+    util.db_update('session_user_map', {"session_key": session_key}, {"user_id": user_id, "the_timestamp": the_timestamp})
 
     return session_key
 

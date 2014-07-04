@@ -52,8 +52,8 @@ def process_session(request):
 
         session_struct2 = _construct_session_struct(the_timestamp + 300)
         session['value2'] = session_struct2.get('key', '')
-        session_key = util.gen_random_string() + '_' + str(the_timestamp)
-        session_key2 = util.gen_random_string() + '_' + str(the_timestamp + 300)
+        session_key = _create_session_key()
+        session_key2 = _create_session_key(offset_timestamp=300)
         session['value'] = session_key
         session['value2'] = session_key2
         session.save()
@@ -159,24 +159,26 @@ def _check_refresh_session(session, session_key, session_key2, user_info):
     the_timestamp = util.get_timestamp()
     user_id = user_info.get('user_id', '')
 
-    (user_id, session_timestamp, session_id) = _deserialize_session_key(session_key)
+    (session_timestamp, session_id) = _deserialize_session_key(session_key)
 
     if the_timestamp - session_timestamp > EXPIRE_TIMESTAMP_SESSION_BLOCK:
         if not session_key2:
-            session_key2 = _create_session_key(user_id)
+            session_key2 = _create_session_key()
 
-        session_key3 = _create_session_key(user_id)
+        session_key3 = _create_session_key(offset_timestamp=300)
 
         session['value'] = session_key2
         session['value2'] = session_key3
         session.save()
 
 
-def _create_session_key(user_id):
+def _create_session_key(user_id=None, offset_timestamp=0):
     the_timestamp = util.get_milli_timestamp()
-    session_key = _serialize_session_key(user_id, the_timestamp, util.gen_random_string())
+    the_timestamp += offset_timestamp
+    session_key = _serialize_session_key(the_timestamp, util.gen_random_string())
 
-    util.db_update('session_user_map', {"session_key": session_key}, {"user_id": user_id, "the_timestamp": the_timestamp})
+    if user_id:
+        util.db_update('session_user_map', {"session_key": session_key}, {"user_id": user_id, "the_timestamp": the_timestamp})
 
     return session_key
 
@@ -184,14 +186,13 @@ def _create_session_key(user_id):
 def _deserialize_session_key(session_key):
     the_list = session_key.split('@')
     if not the_list:
-        return ('', 0, '')
+        return (0, '')
 
-    user_id = the_list[0] if len(the_list) >= 1 else ''
-    session_timestamp = util._int(the_list[1]) if len(the_list) >= 2 else 0
-    session_id = the_list[2] if len(the_list) >= 3 else ''
+    session_timestamp = util._int(the_list[0]) if len(the_list) >= 1 else 0
+    session_id = the_list[1] if len(the_list) >= 0 else ''
 
-    return (user_id, session_timestamp, session_id)
+    return (session_timestamp, session_id)
 
 
-def _serialize_session_key(user_id, session_timestamp, session_id):
-    return '@'.join([user_id, str(session_timestamp), session_id])
+def _serialize_session_key(session_timestamp, session_id):
+    return '@'.join([str(session_timestamp), session_id])

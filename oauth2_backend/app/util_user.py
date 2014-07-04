@@ -135,8 +135,8 @@ def _session_user_mapping(session):
     if not user_info: 
         return (S_ERR, {})
 
-    if _is_to_refresh_google_token(user_info):
-        _refresh_google_token(user_info)
+    #if _is_to_refresh_google_token(user_info):
+    #    _refresh_google_token(user_info)
 
     _check_refresh_session(session, session_key, session_key2, user_info)
 

@@ -29,8 +29,8 @@ def is_valid_user(request):
 def is_valid_user_without_check(request):
     session = request.environ['beaker.session']
     if not session.has_key('value'):
-        cfg.logger.error('session has no value')
-        return (S_ERR, {})
+        process_session(request)
+        session = request.environ['beaker.session']
 
     (error_code, user_info) = _session_user_mapping(session)
 

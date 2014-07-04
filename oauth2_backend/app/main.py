@@ -23,7 +23,7 @@ from app.gevent_server import GeventServer
 
 session_opts = {
     'session.type': 'file',
-    'session.cookie_expires': 1200,
+    'session.timeout': 1200,
     'session.data_dir': '/data/session',
     'session.auto': True
 }

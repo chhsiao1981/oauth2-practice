@@ -20,6 +20,23 @@ def is_valid_user(request):
     if error_code != S_OK:
         return (error_code, user_info)
 
+    user_info['session_value'] = session['value']
+    user_info['session_value2'] = session['value2']
+
+    return (S_OK, user_info)
+
+
+def is_valid_user_without_check(request):
+    session = request.environ['beaker.session']
+    if not session.has_key('value'):
+        cfg.logger.error('session has no value')
+        return (S_ERR, {})
+
+    (error_code, user_info) = _session_user_mapping(session)
+
+    user_info['session_value'] = session['value']
+    user_info['session_value2'] = session['value2']
+
     return (S_OK, user_info)
 
 

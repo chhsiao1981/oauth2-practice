@@ -163,7 +163,7 @@ def login():
     authorization_url, state = google.authorization_url(authorization_base_url,
                                                         # offline for refresh token
                                                         # force to always make user click authorize
-                                                        access_type="offline", approval_prompt="auto")
+                                                        approval_prompt="auto")
 
     util.db_insert('login_info', {"state": state, "the_timestamp": the_timestamp, "params": params, "url": the_path})
 

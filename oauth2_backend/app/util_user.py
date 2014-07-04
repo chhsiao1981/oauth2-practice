@@ -22,6 +22,7 @@ def is_valid_user(request):
 
     user_info['session_value'] = session['value']
     user_info['session_value2'] = session['value2']
+    user_info['session_info'] = session
 
     return (S_OK, user_info)
 
@@ -36,6 +37,7 @@ def is_valid_user_without_check(request):
 
     user_info['session_value'] = session['value']
     user_info['session_value2'] = session['value2']
+    user_info['session_info'] = session
 
     return (S_OK, user_info)
 

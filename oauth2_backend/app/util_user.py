@@ -163,13 +163,17 @@ def _check_refresh_session(session, session_key, session_key2, user_info):
 
     if the_timestamp - session_timestamp > EXPIRE_TIMESTAMP_SESSION_BLOCK:
         if not session_key2:
-            session_key2 = _create_session_key()
+            session_key2 = _create_session_key(user_id=user_id)
 
-        session_key3 = _create_session_key(offset_timestamp=OFFSET_TIMESTAMP_SESSION_BLOCK)
+        session_key3 = _create_session_key(user_id=user_id, offset_timestamp=OFFSET_TIMESTAMP_SESSION_BLOCK)
 
         session['value'] = session_key2
         session['value2'] = session_key3
         session.save()
+
+        session_struct = _extract_session_struct_from_session_key(session_key)
+
+        remove_session(session_struct)
 
 
 def _create_session_key(user_id=None, offset_timestamp=0):

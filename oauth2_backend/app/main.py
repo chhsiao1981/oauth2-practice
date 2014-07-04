@@ -48,7 +48,7 @@ def p_with_check():
 
 @app.get('/without_check')
 def g_without_check():
-    (error_code, user_info) = util_user.is_valid_user_without_check()
+    (error_code, user_info) = util_user.is_valid_user_without_check(request)
 
     return _process_result({"success": True, "error_code": error_code, "user_info": user_info})
 

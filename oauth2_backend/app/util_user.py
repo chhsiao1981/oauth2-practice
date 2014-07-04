@@ -122,6 +122,8 @@ def _session_user_mapping(session):
     cfg.logger.warning('session_list: %s', session_list)
     (error_code, db_results) = util.db_find2('session_user_map', {"session_key": {"$in": session_list}})
 
+    cfg.logger.warning('error_code: %s db_results: %s', error_code, db_results)
+
     if error_code != S_OK:
         return (error_code, {})
 

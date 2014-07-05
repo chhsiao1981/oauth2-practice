@@ -110,7 +110,7 @@ def register():
 
     # return
     login_info = util.db_find_one('login_info', {"state": state})
-    util.db_remove('log_info', {"state": state})
+    util.db_remove('login_info', {"state": state})
 
     qs = login_info.get('url', '')
 

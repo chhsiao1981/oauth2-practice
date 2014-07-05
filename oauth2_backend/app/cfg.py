@@ -22,6 +22,10 @@ _mongo_map = {
 }
 
 _ensure_index = {
+    'login_info': [('state', pymongo.ASCENDING)],
+    'session_user_map': [('session_key', pymongo.ASCENDING)],
+    'session_user_map2': [('the_timestamp', pymongo.ASCENDING)],
+    'user_info': [('user_id', pymongo.ASCENDING)],
 }
 
 def init(params):

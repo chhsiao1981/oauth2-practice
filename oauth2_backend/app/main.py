@@ -205,6 +205,8 @@ def parse_args():
 
 
 def _main():
+    global app
+
     (error_code, args) = parse_args()
 
     cfg.init({"port": args.port, "ini_filename": args.ini})

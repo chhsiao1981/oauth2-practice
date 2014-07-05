@@ -16,7 +16,7 @@ import urllib
 from requests_oauthlib import OAuth2Session
 from beaker.middleware import SessionMiddleware
 
-from app import constants
+from app.constants import *
 from app import cfg
 from app import util
 from app import util_user

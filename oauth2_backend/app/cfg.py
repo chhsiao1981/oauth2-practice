@@ -18,6 +18,7 @@ config = {}
 _mongo_map = {
     'user_info': 'user_info',
     'session_user_map': 'session_user_map',
+    'session_user_map2': 'session_user_map',
     'login_info': 'login_info',
 }
 

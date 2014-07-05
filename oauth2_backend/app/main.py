@@ -16,6 +16,7 @@ import urllib
 from requests_oauthlib import OAuth2Session
 from beaker.middleware import SessionMiddleware
 
+from app import constants
 from app import cfg
 from app import util
 from app import util_user
@@ -23,7 +24,7 @@ from app.gevent_server import GeventServer
 
 session_opts = {
     'session.type': 'file',
-    'session.timeout': 1200,
+    'session.timeout': EXPIRE_TIMESTAMP_SESSION,
     'session.data_dir': '/data/session',
     'session.auto': True
 }

@@ -158,7 +158,7 @@ def _is_to_refresh_google_token(user_info):
 
 
 def _check_refresh_session(session, session_key, session_key2, user_info):
-    the_timestamp = util.get_milli_timestamp()
+    the_timestamp = util.get_timestamp()
     user_id = user_info.get('user_id', '')
 
     (session_timestamp, session_id) = _deserialize_session_key(session_key)
@@ -179,7 +179,7 @@ def _check_refresh_session(session, session_key, session_key2, user_info):
 
 
 def _create_session_key(user_id=None, offset_timestamp=0):
-    the_timestamp = util.get_milli_timestamp()
+    the_timestamp = util.get_timestamp()
     the_timestamp += offset_timestamp
     session_key = _serialize_session_key(the_timestamp, util.gen_random_string())
 

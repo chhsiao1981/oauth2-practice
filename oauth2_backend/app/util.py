@@ -61,11 +61,11 @@ def db_find2(cf_name, key = None, fields={'_id': False}):
 
 
 def get_timestamp():
-    return int(time.time())
-
-
-def get_milli_timestamp():
     return int(time.time() * 1000)
+
+
+def get_unix_timestamp():
+    return int(time.time())
 
 
 def db_find_it(cf_name, key = None, fields={'_id': False}):

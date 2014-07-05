@@ -165,7 +165,7 @@ def login():
     is_cron_remove_expire = cfg.config.get('is_cron_remove_expire', True)
     if not is_cron_remove_expire:
         expire_timestamp_session = cfg.config.get('expire_unix_timestamp_session', EXPIRE_UNIX_TIMESTAMP_SESSION) * 1000
-        util.db_remove('log_info', {"the_timestamp": {"$lt": the_timestamp - expire_timestamp_session}})
+        util.db_remove('login_info', {"the_timestamp": {"$lt": the_timestamp - expire_timestamp_session}})
 
     cfg.logger.debug('after authorization_url: authorization_url: %s state: %s', authorization_url, state)
 

@@ -213,7 +213,7 @@ def _main():
 
     session_opts = {
         'session.type': 'file',
-        'session.timeout': expire_unix_timestamp_session
+        'session.timeout': expire_unix_timestamp_session,
         'session.data_dir': '/data/session',
         'session.auto': True
     }

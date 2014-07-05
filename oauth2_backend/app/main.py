@@ -22,13 +22,6 @@ from app import util
 from app import util_user
 from app.gevent_server import GeventServer
 
-session_opts = {
-    'session.type': 'file',
-    'session.timeout': EXPIRE_TIMESTAMP_SESSION,
-    'session.data_dir': '/data/session',
-    'session.auto': True
-}
-
 app = Bottle()
 
 @app.route('/')
@@ -169,6 +162,11 @@ def login():
 
     util.db_insert('login_info', {"state": state, "the_timestamp": the_timestamp, "params": params, "url": the_path})
 
+    is_cron_remove_expire = cfg.config.get('is_cron_remove_expire', True)
+    if not is_cron_remove_expire:
+        expire_timestamp_session = cfg.config.get('expire_unix_timestamp_session', EXPIRE_UNIX_TIMESTAMP_SESSION) * 1000
+        util.db_remove('log_info', {"the_timestamp": {"$lt": the_timestamp - expire_timestamp_session}})
+
     cfg.logger.debug('after authorization_url: authorization_url: %s state: %s', authorization_url, state)
 
     redirect(authorization_url)
@@ -206,11 +204,24 @@ def parse_args():
     return (S_OK, args)
 
 
-if __name__ == '__main__':
+def _main():
     (error_code, args) = parse_args()
 
     cfg.init({"port": args.port, "ini_filename": args.ini})
 
+    expire_unix_timestamp_session = cfg.config.get('expire_unix_timestamp_session', EXPIRE_UNIX_TIMESTAMP_SESSION)
+
+    session_opts = {
+        'session.type': 'file',
+        'session.timeout': expire_unix_timestamp_session
+        'session.data_dir': '/data/session',
+        'session.auto': True
+    }
+
     app = SessionMiddleware(app, session_opts)
 
     run(app, host='0.0.0.0', port=cfg.config.get('port'), server=GeventServer)
+
+
+if __name__ == '__main__':
+    _main()

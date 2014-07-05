@@ -92,6 +92,11 @@ def save_session_user_map(session_struct, user_id):
 
     util.db_update('session_user_map', {"session_key": session_key}, {'the_timestamp': session_struct.get('the_timestamp', 0), 'user_id': user_id})
 
+    is_cron_remove_expire = cfg.config.get('is_cron_remove_expire', True)
+    if not is_cron_remove_expire:
+        expire_timestamp_session = cfg.config.get('expire_unix_timestamp_session', EXPIRE_UNIX_TIMESTAMP_SESSION) * 1000
+        util.db_remove('session_user_map', {"the_timestamp": expire_timestamp_session})
+
 
 def remove_session(session_struct):
     session_key = session_struct.get('key', '')

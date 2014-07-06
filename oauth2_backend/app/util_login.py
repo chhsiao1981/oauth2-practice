@@ -81,7 +81,7 @@ def register_facebook(request, params):
     _post_register_facebook(content, state, session_struct. session_struct2, request, params)
 
 
-def _post_register_google(content, state, session_struct, session_struct2, request, params):
+def _post_register_facebook(content, state, session_struct, session_struct2, request, params):
     the_struct = util.json_loads(content)
 
     user_id = 'facebook_' + str(the_struct['id'])

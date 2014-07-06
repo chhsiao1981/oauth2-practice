@@ -22,7 +22,6 @@ def login_google(request, params):
 
     scope = cfg.config.get('google_oauth2_scope', ["https://www.googleapis.com/auth/userinfo.profile"])
     register_uri = cfg.config.get('sitename_ssl', 'localhost') + cfg.config.get('google_oauth2_register', '/register_google')
-
     authorization_base_url = cfg.config.get('google_oauth2_auth_url', "https://accounts.google.com/o/oauth2/auth")
 
     _login(client_id, scope, register_uri, authorization_base_url, request, params)
@@ -39,7 +38,7 @@ def register_google(request, params):
 
     (state, session_struct, session_struct2) = _get_session_info(request, params)
 
-    content = _get_oauth_info(client_id, client_secret, scope, redirect_uri, token_url, user_info_url, request, params)
+    content = _get_oauth2_info(client_id, client_secret, scope, redirect_uri, token_url, user_info_url, request, params)
 
     _post_register_google(content, state, session_struct, session_struct2, request, params)
 
@@ -79,7 +78,7 @@ def register_facebook(request, params):
 
     (state, session_struct, session_struct2) = _get_session_info(request, params)
 
-    content = _get_oauth_info(client_id, client_secret, scope, redirect_uri, token_url, user_info_url, request, params, is_facebook=True)
+    content = _get_oauth2_info(client_id, client_secret, scope, redirect_uri, token_url, user_info_url, request, params, is_facebook=True)
 
     _post_register_facebook(content, state, session_struct, session_struct2, request, params)
 
@@ -130,7 +129,7 @@ def _get_session_info(request, params):
     return (state, session_struct, session_struct2)
 
 
-def _get_oauth_info(client_id, client_secret, scope, redirect_uri, token_url, user_info_url, request, params, is_facebook=False):
+def _get_oauth2_info(client_id, client_secret, scope, redirect_uri, token_url, user_info_url, request, params, is_facebook=False):
     headers = dict(request.headers)
     cookies = dict(request.cookies)
 

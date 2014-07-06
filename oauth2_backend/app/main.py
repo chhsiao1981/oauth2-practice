@@ -90,12 +90,6 @@ def register_facebook():
     redirect(redirect_url)
 
 
-@app.get('/remove/user/<user_id>')
-def remove_user(user_id):
-    results = remove_user_handler(user_id)
-    return _process_result(results)
-
-
 @app.get('/logout')
 def logout():
     (session_struct, session_struct2) = util_user.process_session(request)
@@ -104,6 +98,12 @@ def logout():
 
     the_url = 'http://' + cfg.config.get('sitename', 'localhost')
     redirect(the_url)
+
+
+@app.get('/remove/user/<user_id>')
+def remove_user(user_id):
+    results = remove_user_handler(user_id)
+    return _process_result(results)
 
 
 def _redirect_login():

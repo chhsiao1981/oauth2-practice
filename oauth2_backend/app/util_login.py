@@ -30,6 +30,7 @@ def login_google(request, params):
 def register_google(request, params):
     client_id = cfg.config.get('google_oauth2_client_id', '')
     client_secret = cfg.config.get('google_oauth2_client_secret', '')
+
     scope = cfg.config.get('google_oauth2_scope', ["https://www.googleapis.com/auth/userinfo.profile"])
     redirect_uri = cfg.config.get('sitename_ssl', 'localhost') + cfg.config.get('google_oauth2_register', '/register_google')
     token_url = cfg.config.get('google_oauth2_token_url', "https://accounts.google.com/o/oauth2/token")
@@ -69,6 +70,7 @@ def login_facebook(request, params):
 def register_facebook(request, params):
     client_id = cfg.config.get('facebook_oauth2_client_id', '')
     client_secret = cfg.config.get('facebook_oauth2_client_secret', '')
+
     scope = cfg.config.get('facebook_oauth2_scope', ["public_profile"])
     redirect_uri = cfg.config.get('sitename_ssl', 'localhost') + cfg.config.get('facebook_oauth2_register', '/register_facebook')
     token_url = cfg.config.get('facebook_oauth2_token_url', "https://graph.facebook.com/oauth/access_token")

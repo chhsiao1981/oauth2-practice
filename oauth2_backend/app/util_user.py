@@ -88,6 +88,10 @@ def save_user(user_id, session_struct, session_struct2, user_info):
     save_session_user_map(session_struct2, user_id)
 
 
+def remove_user(user_id):
+    util.db_remove('user_info', {"user_id": user_id})
+
+
 def save_session_user_map(session_struct, user_id):
     session_key = session_struct.get('key', '')
     if not session_key:

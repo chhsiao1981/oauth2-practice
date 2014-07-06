@@ -58,23 +58,6 @@ def d_id(the_id):
     return ''
 
 
-@app.get('/register_google')
-def register():
-    params = _process_params()
-    util_login.register_google(request, params)
-    redirect(redirect_url)
-
-
-@app.get('/logout')
-def logout():
-    (session_struct, session_struct2) = util_user.process_session(request)
-    util_user.remove_session(session_struct)
-    util_user.remove_session(session_struct2)
-
-    the_url = 'http://' + cfg.config.get('sitename', 'localhost')
-    redirect(the_url)
-
-
 @app.get('/login')
 def login():
     login_google()
@@ -85,6 +68,42 @@ def login():
 def login_google():
     params = _process_params()
     util_login.login_google(request, params)
+
+
+@app.get('/register_google')
+def register_google():
+    params = _process_params()
+    util_login.register_google(request, params)
+    redirect(redirect_url)
+
+
+@app.get('/login_facebook')
+def login_facebook():
+    params = _process_params()
+    util_login.login_facebook(request, params)
+
+
+@app.get('/register_facebook')
+def register_facebook():
+    params = _process_params()
+    util_login.register_facebook(request, params)
+    redirect(redirect_url)
+
+
+@app.get('/remove/user/<user_id>')
+def remove_user(user_id):
+    results = remove_user_handler(user_id)
+    return _process_result(results)
+
+
+@app.get('/logout')
+def logout():
+    (session_struct, session_struct2) = util_user.process_session(request)
+    util_user.remove_session(session_struct)
+    util_user.remove_session(session_struct2)
+
+    the_url = 'http://' + cfg.config.get('sitename', 'localhost')
+    redirect(the_url)
 
 
 def _redirect_login():

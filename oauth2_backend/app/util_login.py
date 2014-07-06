@@ -131,7 +131,7 @@ def _get_oauth_info(client_id, client_secret, scope, redirect_uri, token_url, us
     headers = dict(request.headers)
     cookies = dict(request.cookies)
 
-    cfg.logger.debug('params: %s headers: %s session_struct: %s cookies: %s state: %s', params, headers, session_struct, cookies, state)
+    cfg.logger.debug('params: %s headers: %s cookies: %s', params, headers, cookies)
 
     the_auth = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
 

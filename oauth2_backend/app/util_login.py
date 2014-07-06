@@ -20,7 +20,7 @@ def login_google(request, params):
     client_id = cfg.config.get('google_oauth2_client_id', '')
 
     scope = cfg.config.get('google_oauth2_scope', ["https://www.googleapis.com/auth/userinfo.profile"])
-    register_uri = config.get('sitename_ssl', 'localhost') + cfg.config.get('google_oauth2_register', '/register_google')
+    register_uri = cfg.config.get('sitename_ssl', 'localhost') + cfg.config.get('google_oauth2_register', '/register_google')
 
     authorization_base_url = cfg.config.get('google_oauth2_auth_url', "https://accounts.google.com/o/oauth2/auth")
 
@@ -60,7 +60,7 @@ def login_facebook(request, params):
     client_id = cfg.config.get('facebook_oauth2_client_id', '')
 
     scope = cfg.config.get('facebook_oauth2_scope', ["public_profile"])
-    register_uri = config.get('sitename_ssl', 'localhost') + cfg.config.get('facebook_oauth2_register', '/register_facebook')
+    register_uri = cfg.config.get('sitename_ssl', 'localhost') + cfg.config.get('facebook_oauth2_register', '/register_facebook')
     authorization_base_url = cfg.config.get('facebook_oauth2_auth_url', "https://www.facebook.com/dialog/oauth")
 
     _login(client_id, scope, register_uri, authorization_base_url, request, params)

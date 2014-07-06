@@ -139,7 +139,7 @@ def _get_oauth_info(client_id, client_secret, scope, redirect_uri, token_url, us
     the_auth = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
 
     if is_facebook:
-        the_auth = facebook_compliance_fix(facebook)
+        the_auth = facebook_compliance_fix(the_auth)
 
     # fetch token
     #the_path = params.get('url', '')

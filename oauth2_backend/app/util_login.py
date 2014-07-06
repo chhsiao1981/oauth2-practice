@@ -74,7 +74,7 @@ def register_facebook(request, params):
     scope = cfg.config.get('facebook_oauth2_scope', ["public_profile"])
     redirect_uri = cfg.config.get('sitename_ssl', 'localhost') + cfg.config.get('facebook_oauth2_register', '/register_facebook')
     token_url = cfg.config.get('facebook_oauth2_token_url', "https://graph.facebook.com/oauth/access_token")
-    user_info_url = cfg.config.get('google_oauth2_user_info_url', 'https://www.googleapis.com/oauth2/v1/userinfo')
+    user_info_url = cfg.config.get('facebook_oauth2_user_info_url', 'https://graph.facebook.com/me?')
 
     (state, session_struct, session_struct2) = _get_session_info(request, params)
 

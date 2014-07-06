@@ -20,6 +20,7 @@ from app.constants import *
 from app import cfg
 from app import util
 from app import util_user
+from app import util_login
 from app.gevent_server import GeventServer
 
 app = Bottle()
@@ -57,67 +58,10 @@ def d_id(the_id):
     return ''
 
 
-@app.get('/register')
+@app.get('/register_google')
 def register():
-    (session_struct, session_struct2) = util_user.process_session(request)
-    cfg.logger.debug('session_struct: %s session_struct2: %s', session_struct, session_struct2)
-
-    headers = dict(request.headers)
-    cookies = dict(request.cookies)
     params = _process_params()
-    state = params.get('state', '')
-
-    cfg.logger.debug('params: %s headers: %s session_struct: %s cookies: %s state: %s', params, headers, session_struct, cookies, state)
-
-    client_id = cfg.config.get('oauth2_client_id', '')
-    redirect_uri = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/register'
-    scope = [
-        "https://www.googleapis.com/auth/userinfo.profile",
-    ]
-
-    google = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
-
-    # fetch token
-    token_url = "https://accounts.google.com/o/oauth2/token"
-    #the_path = params.get('url', '')
-    qs = urllib.urlencode(params)
-
-    redirect_url = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/register?' + qs
-
-    client_secret = cfg.config.get('oauth2_client_secret', '')
-
-    cfg.logger.debug('redirect_url: %s', redirect_url)
-
-    token = google.fetch_token(token_url, client_secret=client_secret, 
-                           authorization_response=redirect_url)
-
-    cfg.logger.debug('after fetch_token: token: (%s, %s)', token, token.__class__.__name__)
-
-    # get user info
-    r = google.get('https://www.googleapis.com/oauth2/v1/userinfo')
-
-    the_struct = util.json_loads(r.content)
-
-    user_id = 'google_' + str(the_struct['id'])
-
-    # save
-    util_user.save_user(user_id, session_struct.get('key', ''), session_struct2.get('key', ''), {"google_id": the_struct['id'], 'name': the_struct['name'], 'given_name': the_struct['given_name'], 'family_name': the_struct['family_name'], 'token': token})
-
-    util_user.save_session_user_map(session_struct, user_id)
-    util_user.save_session_user_map(session_struct2, user_id)
-
-    cfg.logger.debug('user_info: r.content: (%s, %s) the_struct: (%s, %s)', r.content, r.content.__class__.__name__, the_struct, the_struct.__class__.__name__)
-
-    # return
-    login_info = util.db_find_one('login_info', {"state": state})
-    util.db_remove('login_info', {"state": state})
-
-    qs = login_info.get('url', '')
-
-    redirect_url = 'http://' + cfg.config.get('sitename', 'localhost') + qs
-
-    cfg.logger.warning('to redirect: redirect_url: %s', redirect_url)
-
+    util_login.register_google(request, params)
     redirect(redirect_url)
 
 
@@ -133,43 +77,14 @@ def logout():
 
 @app.get('/login')
 def login():
-    (session_struct, session_struct2) = util_user.process_session(request)
-    cfg.logger.debug('session_struct: %s session_struct2: %s', session_struct, session_struct2)
+    login_google()
+    pass
 
+
+@app.get('/login_google')
+def login_google():
     params = _process_params()
-    the_path = params.get('url', '')
-
-    the_timestamp = util.get_timestamp()
-
-    cfg.logger.debug('params: %s the_path: %s', params, the_path)
-
-    client_secret = cfg.config.get('oauth2_client_secret', '')
-
-    authorization_base_url = "https://accounts.google.com/o/oauth2/auth"
-
-    client_id = cfg.config.get('oauth2_client_id', '')
-    redirect_uri = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + '/register'
-    scope = [
-        "https://www.googleapis.com/auth/userinfo.profile",
-    ]
-
-    google = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
-
-    authorization_url, state = google.authorization_url(authorization_base_url,
-                                                        # offline for refresh token
-                                                        # force to always make user click authorize
-                                                        approval_prompt="auto")
-
-    util.db_insert('login_info', {"state": state, "the_timestamp": the_timestamp, "params": params, "url": the_path})
-
-    is_cron_remove_expire = cfg.config.get('is_cron_remove_expire', True)
-    if not is_cron_remove_expire:
-        expire_timestamp_session = cfg.config.get('expire_unix_timestamp_session', EXPIRE_UNIX_TIMESTAMP_SESSION) * 1000
-        util.db_remove('login_info', {"the_timestamp": {"$lt": the_timestamp - expire_timestamp_session}})
-
-    cfg.logger.debug('after authorization_url: authorization_url: %s state: %s', authorization_url, state)
-
-    redirect(authorization_url)
+    util_login.login_google(request, params)
 
 
 def _redirect_login():

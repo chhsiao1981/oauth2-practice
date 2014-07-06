@@ -81,8 +81,11 @@ def process_session(request):
     return (session_struct, session_struct2)
 
 
-def save_user(user_id, session_key, session_key2, user_info):
+def save_user(user_id, session_struct, session_struct2, user_info):
     util.db_update('user_info', {"user_id": user_id}, {"user_info": user_info})
+
+    save_session_user_map(session_struct, user_id)
+    save_session_user_map(session_struct2, user_id)
 
 
 def save_session_user_map(session_struct, user_id):

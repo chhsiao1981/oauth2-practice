@@ -81,7 +81,7 @@ def register_facebook(request, params):
 
     content = _get_oauth_info(client_id, client_secret, scope, redirect_uri, token_url, user_info_url, request, params, is_facebook=True)
 
-    _post_register_facebook(content, state, session_struct. session_struct2, request, params)
+    _post_register_facebook(content, state, session_struct, session_struct2, request, params)
 
 
 def _post_register_facebook(content, state, session_struct, session_struct2, request, params):

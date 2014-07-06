@@ -17,6 +17,85 @@ from app import util_user
 
 
 def login_google(request, params):
+    client_id = cfg.config.get('google_oauth2_client_id', '')
+
+    scope = cfg.config.get('google_oauth2_scope', ["https://www.googleapis.com/auth/userinfo.profile"])
+    register_uri = config.get('sitename_ssl', 'localhost') + cfg.config.get('google_oauth2_register', '/register_google')
+
+    authorization_base_url = cfg.config.get('google_oauth2_auth_url', "https://accounts.google.com/o/oauth2/auth")
+
+    _login(client_id, scope, register_uri, authorization_base_url, request, params)
+
+
+def register_google(request, params):
+    client_id = cfg.config.get('google_oauth2_client_id', '')
+    client_secret = cfg.config.get('google_oauth2_client_secret', '')
+    scope = cfg.config.get('google_oauth2_scope', ["https://www.googleapis.com/auth/userinfo.profile"])
+    redirect_uri = cfg.config.get('sitename_ssl', 'localhost') + cfg.config.get('google_oauth2_register', '/register_google')
+    token_url = cfg.config.get('google_oauth2_token_url', "https://accounts.google.com/o/oauth2/token")
+    user_info_url = cfg.config.get('google_oauth2_user_info_url', 'https://www.googleapis.com/oauth2/v1/userinfo')
+
+    (state, session_struct, session_struct2) = _get_session_info(request, params)
+
+    content = _get_oauth_info(client_id, client_secret, scope, redirect_uri, token_url, user_info_url, request, params)
+
+    _post_register_google(content, state, session_struct, session_struct2, request, params)
+
+
+def _post_register_google(content, state, session_struct, session_struct2, request, params):
+    the_struct = util.json_loads(content)
+
+    user_id = 'google_' + str(the_struct['id'])
+
+    # save
+    util_user.save_user(user_id, session_struct, session_struct2, {"google_id": the_struct['id'], 'name': the_struct['name'], 'given_name': the_struct['given_name'], 'family_name': the_struct['family_name'], 'extension': the_struct})
+
+    cfg.logger.debug('user_info: content: (%s, %s) the_struct: (%s, %s)', content, content.__class__.__name__, the_struct, the_struct.__class__.__name__)
+
+    # return
+    _redirect_register(state)
+
+
+def login_facebook(request, params):
+    client_id = cfg.config.get('facebook_oauth2_client_id', '')
+
+    scope = cfg.config.get('facebook_oauth2_scope', ["public_profile"])
+    register_uri = config.get('sitename_ssl', 'localhost') + cfg.config.get('facebook_oauth2_register', '/register_facebook')
+    authorization_base_url = cfg.config.get('facebook_oauth2_auth_url', "https://www.facebook.com/dialog/oauth")
+
+    _login(client_id, scope, register_uri, authorization_base_url, request, params)
+
+
+def register_facebook(request, params):
+    client_id = cfg.config.get('facebook_oauth2_client_id', '')
+    client_secret = cfg.config.get('facebook_oauth2_client_secret', '')
+    scope = cfg.config.get('facebook_oauth2_scope', ["public_profile"])
+    redirect_uri = cfg.config.get('sitename_ssl', 'localhost') + cfg.config.get('facebook_oauth2_register', '/register_facebook')
+    token_url = cfg.config.get('facebook_oauth2_token_url', "https://graph.facebook.com/oauth/access_token")
+    user_info_url = cfg.config.get('google_oauth2_user_info_url', 'https://www.googleapis.com/oauth2/v1/userinfo')
+
+    (state, session_struct, session_struct2) = _get_session_info(request, params)
+
+    content = _get_oauth_info(client_id, client_secret, scope, redirect_uri, token_url, user_info_url, request, params)
+
+    _post_register_facebook(content, state, session_struct. session_struct2, request, params)
+
+
+def _post_register_google(content, state, session_struct, session_struct2, request, params):
+    the_struct = util.json_loads(content)
+
+    user_id = 'facebook_' + str(the_struct['id'])
+
+    # save
+    cfg.logger.debug('user_info: content: (%s, %s) the_struct: (%s, %s)', content, content.__class__.__name__, the_struct, the_struct.__class__.__name__)
+
+    util_user.save_user(user_id, session_struct, session_struct2, {"facebook_id": the_struct['id'], 'name': the_struct.get('name', ''), 'given_name': the_struct['first_name'], 'family_name': the_struct['last_name'], 'extension': the_struct})
+
+    # return
+    _redirect_register(state)
+
+
+def _login(client_id, scope, register_uri, authorization_base_url, request, params):
     (session_struct, session_struct2) = util_user.process_session(request)
     cfg.logger.debug('session_struct: %s session_struct2: %s', session_struct, session_struct2)
 
@@ -24,11 +103,6 @@ def login_google(request, params):
     the_timestamp = util.get_timestamp()
 
     cfg.logger.debug('params: %s the_path: %s', params, the_path)
-
-    client_id = cfg.config.get('google_oauth2_client_id', '')
-    scope = cfg.config.get('google_oauth2_scope', ["https://www.googleapis.com/auth/userinfo.profile"])
-    register_uri = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + cfg.config.get('google_oauth2_register', '/register_google')
-    authorization_base_url = cfg.config.get('google_oauth2_auth_url', "https://accounts.google.com/o/oauth2/auth")
 
     the_auth = OAuth2Session(client_id, scope=scope, redirect_uri=register_uri)
 
@@ -46,22 +120,18 @@ def login_google(request, params):
     redirect(authorization_url)
 
 
-def register_google(request, params):
+def _get_session_info(request, params):
     (session_struct, session_struct2) = util_user.process_session(request)
-    cfg.logger.debug('session_struct: %s session_struct2: %s', session_struct, session_struct2)
-
-    headers = dict(request.headers)
-    cookies = dict(request.cookies)
     state = params.get('state', '')
 
-    cfg.logger.debug('params: %s headers: %s session_struct: %s cookies: %s state: %s', params, headers, session_struct, cookies, state)
+    return (state, session_struct, session_struct2)
 
-    client_id = cfg.config.get('google_oauth2_client_id', '')
-    client_secret = cfg.config.get('google_oauth2_client_secret', '')
-    scope = cfg.config.get('google_oauth2_scope', ["https://www.googleapis.com/auth/userinfo.profile"])
-    redirect_uri = 'https://' + cfg.config.get('sitename_ssl', 'localhost') + cfg.config.get('google_oauth2_register', '/register_google')
-    token_url = cfg.config.get('google_oauth2_token_url', "https://accounts.google.com/o/oauth2/token")
-    user_info_url = cfg.config.get('google_oauth2_user_info_url', 'https://www.googleapis.com/oauth2/v1/userinfo')
+
+def _get_oauth_info(client_id, client_secret, scope, redirect_uri, token_url, user_info_url, request, params):    
+    headers = dict(request.headers)
+    cookies = dict(request.cookies)
+
+    cfg.logger.debug('params: %s headers: %s session_struct: %s cookies: %s state: %s', params, headers, session_struct, cookies, state)
 
     the_auth = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
 
@@ -78,22 +148,16 @@ def register_google(request, params):
     # get user info
     r = the_auth.get(user_info_url)
 
-    the_struct = util.json_loads(r.content)
+    return r.content
 
-    user_id = 'google_' + str(the_struct['id'])
 
-    # save
-    util_user.save_user(user_id, session_struct, session_struct2, {"google_id": the_struct['id'], 'name': the_struct['name'], 'given_name': the_struct['given_name'], 'family_name': the_struct['family_name'], 'extension': the_struct})
-
-    cfg.logger.debug('user_info: r.content: (%s, %s) the_struct: (%s, %s)', r.content, r.content.__class__.__name__, the_struct, the_struct.__class__.__name__)
-
-    # return
+def _redirect_register(state):
     login_info = util.db_find_one('login_info', {"state": state})
     util.db_remove('login_info', {"state": state})
 
     path_qs = login_info.get('url', '')
 
-    redirect_url = 'http://' + cfg.config.get('sitename', 'localhost') + path_qs
+    redirect_url = cfg.config.get('sitename', 'localhost') + path_qs
 
     cfg.logger.warning('to redirect: redirect_url: %s', redirect_url)
 

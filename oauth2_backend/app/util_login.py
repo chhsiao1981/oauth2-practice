@@ -9,6 +9,7 @@ import ujson as json
 from requests_oauthlib import OAuth2Session
 from bottle import redirect
 import urllib
+from requests_oauthlib.compliance_fixes import facebook_compliance_fix
 
 from app.constants import *
 from app import cfg
@@ -78,7 +79,7 @@ def register_facebook(request, params):
 
     (state, session_struct, session_struct2) = _get_session_info(request, params)
 
-    content = _get_oauth_info(client_id, client_secret, scope, redirect_uri, token_url, user_info_url, request, params)
+    content = _get_oauth_info(client_id, client_secret, scope, redirect_uri, token_url, user_info_url, request, params, is_facebook=True)
 
     _post_register_facebook(content, state, session_struct. session_struct2, request, params)
 
@@ -129,13 +130,16 @@ def _get_session_info(request, params):
     return (state, session_struct, session_struct2)
 
 
-def _get_oauth_info(client_id, client_secret, scope, redirect_uri, token_url, user_info_url, request, params):    
+def _get_oauth_info(client_id, client_secret, scope, redirect_uri, token_url, user_info_url, request, params, is_facebook=False):
     headers = dict(request.headers)
     cookies = dict(request.cookies)
 
     cfg.logger.debug('params: %s headers: %s cookies: %s', params, headers, cookies)
 
     the_auth = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
+
+    if is_facebook:
+        the_auth = facebook_compliance_fix(facebook)
 
     # fetch token
     #the_path = params.get('url', '')
